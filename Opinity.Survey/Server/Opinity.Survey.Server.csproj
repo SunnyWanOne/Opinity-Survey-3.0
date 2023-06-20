@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -35,9 +35,5 @@
   <ItemGroup>
     <PackageReference Include="Oqtane.Server" Version="3.4.3" />
     <PackageReference Include="Oqtane.Shared" Version="3.4.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\_content\" />
   </ItemGroup>
 </Project>
