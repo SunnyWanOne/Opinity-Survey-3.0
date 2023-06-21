@@ -1,6 +1,9 @@
 @using Opinity.Survey.Services
 @using Opinity.Survey.Models
 @using Microsoft.AspNetCore.Components.Authorization
+@using System;
+@using System.Collections.Generic;
+@using Microsoft.AspNetCore.Authorization;
 
 @namespace Opinity.Survey
 @inherits ModuleBase
@@ -117,7 +120,8 @@ else
                         <h4>No Survey Items</h4>
                     }
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="Responses">
+
+                <RadzenTabsItem Text="Response graph">
                     <RadzenPanel AllowCollapse="false" Style="margin-bottom: 10px">
                         <ChildContent>
                             <RadzenDataList Count="@SurveyResultsCount"
@@ -148,14 +152,41 @@ else
                         </ChildContent>
                     </RadzenPanel>
                 </RadzenTabsItem>
+
+
+                <RadzenTabsItem Text="Response list">
+                    <RadzenPanel AllowCollapse="false" Style="margin-bottom: 10px">
+                        <RadzenDataGrid AllowFiltering="true" 
+                            AllowColumnResize="true" 
+                            AllowAlternatingRows="false" 
+                            FilterMode="FilterMode.Advanced" 
+                            AllowSorting="true" 
+                            PageSize="5" 
+                            AllowPaging="true" 
+                            PagerHorizontalAlign="HorizontalAlign.Left" 
+                            ShowPagingSummary="true"
+                                        Count="@SurveyResultsCount"
+                                        LoadData="@LoadSurveyResultsData"
+                                        Data="@SurveyResults"
+                                        TItem="SurveyItem" 
+                                    <RadzenDataGridColumn TItem="SurveyItem" Property="AnswerResponses" Filterable="false" Title="AnswerResponses" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+                                <RadzenDataGridColumn TItem="SurveyItem" Property="ItemLabel" Title="ItemLabel" Frozen="true" Width="160px" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenPanel>
+                </RadzenTabsItem>
             </Tabs>
         </RadzenTabs>
+
+
+
+
     }
 }
 @code {
     bool radzenInitialized = false;
     public override SecurityAccessLevel SecurityAccessLevel => SecurityAccessLevel.Anonymous;
-
+    bool allowVirtualization;
 
     public override List<Resource> Resources => new List<Resource>()
     {

@@ -43,6 +43,7 @@ namespace Opinity.Survey.Models
     {
         public string OptionLabel { get; set; }
         public double Responses { get; set; }
+
     }
 
     public class SurveyAnswer
