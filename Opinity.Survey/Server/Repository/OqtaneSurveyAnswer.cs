@@ -13,6 +13,6 @@ namespace Opinity.Survey.Server.Repository
         public int? UserId { get; set; }
         public string AnonymousCookie { get; set; }
 
-        public virtual OqtaneSurveyItem SurveyItem { get; set; }
+        public virtual OqtaneSurveyItem SurveyItem { get; set; } 
     }
 }

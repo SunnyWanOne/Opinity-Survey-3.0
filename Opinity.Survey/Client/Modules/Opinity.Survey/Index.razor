@@ -233,7 +233,7 @@ else
             AddModuleMessage("Error Loading Survey", MessageType.Error);
         }
     }
-    //public string uriString = "https://surveylistopinity.atlassian.net/";
+
     System.Uri uri = new System.Uri("https://surveylistopinity.atlassian.net/");
     public string userName = "supersunnywan@gmail.com";
     public string apiKey = "ATATT3xFfGF0l_laFrNy_SegjxUITnT4HlDxF-yaRppjC5EEF355ywlNW0NNbTOxwOEkk0o5nybWYDOLCSum0JhVDfpSvlMNtRZ8BeQ0kLBvazsUpd6ZUWmOorHbM5LmA4Vmu6D0Dh9OvEosMErsXUVRuzIHCueyHTanttTeYsceoWrYizWkf4c=08DECC5C";
@@ -266,9 +266,10 @@ else
             await SurveyAnswersService.CreateSurveyAnswersAsync(SelectedSurvey);
 
             CompleteSurvey();
+
             var result = await CreateTaskTicket(
             uri, userName, apiKey, projectKey,
-            "Hello, world!",
+            @SelectedSurvey.SurveyName,
             "This is a ticket created from C# code!");
         }
         catch (Exception ex)
@@ -309,20 +310,22 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
-    private static HttpClient client = new HttpClient();
     public static async Task<JiraTicketResponse> CreateTaskTicket(Uri jiraUri, string userName, string apiKey, string projectKey, string summary, string description)
     {
         var authData = System.Text.Encoding.UTF8.GetBytes($"{userName}:{apiKey}");
         var basicAuthentication = Convert.ToBase64String(authData);
+
+        HttpClient client = new HttpClient();
+
         client.BaseAddress = jiraUri;
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthentication);
-        var data = new
+        var StringContent = new
         {
             fields = new
             {
                 issuetype = new { name = "Task" },
                 summary = summary,
-                project = new { key = projectKey /*Key of your project*/},
+                project = new { key = projectKey },
                 description = new
                 {
                     version = 1,
@@ -341,7 +344,8 @@ else
                 }
             }
         };
-        var result = await client.PostAsJsonAsync("/rest/api/3/issue", data);
+
+        var result = await client.PostAsJsonAsync("/rest/api/3/issue", StringContent);
         if (result.StatusCode == System.Net.HttpStatusCode.Created)
             return await result.Content.ReadFromJsonAsync<JiraTicketResponse>();
         else
