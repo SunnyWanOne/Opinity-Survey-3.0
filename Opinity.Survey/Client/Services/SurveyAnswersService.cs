@@ -32,5 +32,6 @@ namespace Opinity.Survey.Services
         {
             await PostJsonAsync(CreateAuthorizationPolicyUrl($"{Apiurl}", EntityNames.Module, Survey.ModuleId), Survey);
         }
+
     }
 }

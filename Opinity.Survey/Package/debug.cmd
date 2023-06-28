@@ -7,3 +7,5 @@ XCOPY "..\Shared\bin\Debug\net6.0\Opinity.Survey.Shared.Oqtane.pdb" "..\..\oqtan
 XCOPY "..\Server\wwwroot\*" "..\..\oqtane.framework-3.4.3\Oqtane.Server\wwwroot\" /Y /S /I
 XCOPY "..\Server\bin\Debug\net6.0\Radzen.Blazor.dll" "..\..\oqtane.framework-3.4.3\Oqtane.Server\bin\Debug\net6.0\" /Y
 XCOPY "..\Server\bin\Debug\net6.0\System.Linq.Dynamic.Core.dll" "..\..\oqtane.framework-3.4.3\Oqtane.Server\bin\Debug\net6.0\" /Y
+XCOPY "..\Server\bin\Debug\net6.0\RestAPI-JIRA-Lib.dll" "..\..\oqtane.framework-3.4.3\Oqtane.Server\bin\Debug\net6.0\" /Y
+XCOPY "..\Server\bin\Debug\net6.0\Newtonsoft.Json.dll" "..\..\oqtane.framework-3.4.3\Oqtane.Server\bin\Debug\net6.0\" /Y

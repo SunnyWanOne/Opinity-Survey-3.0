@@ -4,6 +4,9 @@
 @using System;
 @using System.Collections.Generic;
 @using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http.Headers;
+@using System.Net.Http.Json;
 
 @namespace Opinity.Survey
 @inherits ModuleBase
@@ -169,6 +172,9 @@ else
                                         LoadData="@LoadSurveyResultsData"
                                         Data="@SurveyResults"
                                         TItem="SurveyItem" 
+                            ColumnWidth="300px" 
+                            LogicalFilterOperator="LogicalFilterOperator.Or">
+                            <Columns>
                                     <RadzenDataGridColumn TItem="SurveyItem" Property="AnswerResponses" Filterable="false" Title="AnswerResponses" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
                                 <RadzenDataGridColumn TItem="SurveyItem" Property="ItemLabel" Title="ItemLabel" Frozen="true" Width="160px" />
                             </Columns>
@@ -186,7 +192,6 @@ else
 @code {
     bool radzenInitialized = false;
     public override SecurityAccessLevel SecurityAccessLevel => SecurityAccessLevel.Anonymous;
-    bool allowVirtualization;
 
     public override List<Resource> Resources => new List<Resource>()
     {
@@ -228,6 +233,11 @@ else
             AddModuleMessage("Error Loading Survey", MessageType.Error);
         }
     }
+    //public string uriString = "https://surveylistopinity.atlassian.net/";
+    System.Uri uri = new System.Uri("https://surveylistopinity.atlassian.net/");
+    public string userName = "supersunnywan@gmail.com";
+    public string apiKey = "ATATT3xFfGF0l_laFrNy_SegjxUITnT4HlDxF-yaRppjC5EEF355ywlNW0NNbTOxwOEkk0o5nybWYDOLCSum0JhVDfpSvlMNtRZ8BeQ0kLBvazsUpd6ZUWmOorHbM5LmA4Vmu6D0Dh9OvEosMErsXUVRuzIHCueyHTanttTeYsceoWrYizWkf4c=08DECC5C";
+    public string projectKey = "SR";
 
     async Task SaveSurvey()
     {
@@ -256,12 +266,17 @@ else
             await SurveyAnswersService.CreateSurveyAnswersAsync(SelectedSurvey);
 
             CompleteSurvey();
+            var result = await CreateTaskTicket(
+            uri, userName, apiKey, projectKey,
+            "Hello, world!",
+            "This is a ticket created from C# code!");
         }
         catch (Exception ex)
         {
             await logger.LogError(ex, "Error in SaveSurvey {Error}", ex.Message);
             AddModuleMessage("Error in SaveSurvey", MessageType.Error);
         }
+
     }
 
     void CompleteSurvey()
@@ -293,4 +308,51 @@ else
 
         await InvokeAsync(StateHasChanged);
     }
+
+    private static HttpClient client = new HttpClient();
+    public static async Task<JiraTicketResponse> CreateTaskTicket(Uri jiraUri, string userName, string apiKey, string projectKey, string summary, string description)
+    {
+        var authData = System.Text.Encoding.UTF8.GetBytes($"{userName}:{apiKey}");
+        var basicAuthentication = Convert.ToBase64String(authData);
+        client.BaseAddress = jiraUri;
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthentication);
+        var data = new
+        {
+            fields = new
+            {
+                issuetype = new { name = "Task" },
+                summary = summary,
+                project = new { key = projectKey /*Key of your project*/},
+                description = new
+                {
+                    version = 1,
+                    type = "doc",
+                    content = new[] {
+                        new {
+                            type = "paragraph",
+                            content = new []{
+                                new {
+                                    type = "text",
+                                    text =  description
+                                }
+                            }
+                        }
+            }
+                }
+            }
+        };
+        var result = await client.PostAsJsonAsync("/rest/api/3/issue", data);
+        if (result.StatusCode == System.Net.HttpStatusCode.Created)
+            return await result.Content.ReadFromJsonAsync<JiraTicketResponse>();
+        else
+            throw new Exception(await result.Content.ReadAsStringAsync());
+    }
+    public class JiraTicketResponse
+    {
+        public int Id { get; set; }
+        public string Key { get; set; }
+        public Uri Self { get; set; }
+    }
+}
+
 }
